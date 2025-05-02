@@ -2,10 +2,11 @@ from flask import Flask, jsonify, request
 import requests
 from markupsafe import escape
 
+from api.redis_client import redis_connection
+
 API_KEY = "3e4bbdc8"
 app = Flask(__name__)
-
-dummy_db = {}
+r = redis_connection()
 
 
 @app.route("/")
@@ -16,16 +17,17 @@ def index():
 @app.post("/api/movies")
 def post_movie():
     """
-    example schema:
-        { title: string, note: string }
+    Adds movie to my list
     """
     note = request.form["note"]
-    deconstructed_title = [word for word in request.form["title"].split()]
+    deconstructed_title = [
+        word.strip().lower() for word in request.form["title"].split()
+    ]
     title_for_url = "+".join(deconstructed_title)
-    r = requests.post(
+    res = requests.post(
         "https://www.omdbapi.com/?", params={"t": title_for_url, "apiKey": API_KEY}
     )
-    response_data = r.json()
+    response_data = res.json()
 
     ## Error handling
     if response_data.get("Response") == "False":
@@ -36,6 +38,19 @@ def post_movie():
         "_genres": [s.strip().lower() for s in response_data.get("Genre").split(",")],
         "_note": note,
     }
+
+    # write data to redis
+    r.hset(
+        scheme.get("_title"),
+        mapping={
+            "title": scheme.get("_title"),
+            "note": scheme.get("_note"),
+        },
+    )
+    r.delete(f"{scheme.get("_title")}:genres")
+    # * is the spread operator in Python
+    r.rpush(f"{scheme.get("_title")}:genres", *scheme.get("_genres"))
+
     return (
         jsonify(
             {
