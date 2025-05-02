@@ -1,18 +1,18 @@
-### Flask Docker API
+## Flask Docker API
 
 This is a simple API made in Flask and *hopefully* deployed from a Docker container
 
-## Important commands
+### Important commands
 
-Starting Flask app in debug mode for testing
+Starting Flask app in debug mode for testing  
 `flask --app api/app run --debug`
 
-Running tests
+Running tests  
 `pytest`
 
-Starting redis instance for testing
+Starting redis instance for testing  
 `docker start test-redis`
 
-Stopping redis instance
+Stopping redis instance  
 `docker stop test-redis`
 
