@@ -14,7 +14,7 @@ def index():
 
 
 @app.post("/api/movies")
-def add_two():
+def post_movie():
     """
     example schema:
         { title: string, note: string }
@@ -26,7 +26,6 @@ def add_two():
         "https://www.omdbapi.com/?", params={"t": title_for_url, "apiKey": API_KEY}
     )
     response_data = r.json()
-    print(response_data)
 
     ## Error handling
     if response_data.get("Response") == "False":
@@ -34,6 +33,17 @@ def add_two():
 
     scheme = {
         "_title": response_data.get("Title", request.form["title"]),
+        "_genres": [s.strip().lower() for s in response_data.get("Genre").split(",")],
         "_note": note,
     }
-    return jsonify({"message": f"Movie added successfully!", "scheme": scheme}), 201
+    return (
+        jsonify(
+            {
+                "message": f"Movie added successfully!",
+                "title": scheme.get("_title"),
+                "genres": scheme.get("_genres"),
+                "note": scheme.get("_note"),
+            }
+        ),
+        201,
+    )
