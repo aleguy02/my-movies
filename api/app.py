@@ -14,6 +14,7 @@ def index():
     return "hello world"
 
 
+## TODO: Handle duplicate post
 @app.post("/api/movies")
 def post_movie():
     """
@@ -34,22 +35,25 @@ def post_movie():
         return jsonify({"Error": response_data.get("Error", "Unknown Error")}), 404
 
     scheme = {
-        "_title": response_data.get("Title", request.form["title"]),
+        "_title": response_data.get("Title", request.form["title"]).strip(),
         "_genres": [s.strip().lower() for s in response_data.get("Genre").split(",")],
         "_note": note,
     }
 
     # write data to redis
     r.hset(
-        scheme.get("_title"),
+        scheme.get("_title").lower(),
         mapping={
             "title": scheme.get("_title"),
             "note": scheme.get("_note"),
         },
     )
-    r.delete(f"{scheme.get("_title")}:genres")
-    # * is the spread operator in Python
-    r.rpush(f"{scheme.get("_title")}:genres", *scheme.get("_genres"))
+
+    # delete anything that might be there
+    r.delete(f"{scheme.get("_title").lower()}:genres")
+
+    # and write movie genres
+    r.rpush(f"{scheme.get("_title").lower()}:genres", *scheme.get("_genres"))
 
     return (
         jsonify(
@@ -61,4 +65,33 @@ def post_movie():
             }
         ),
         201,
+    )
+
+
+@app.get("/api/movies")
+def get_movies():
+    out = {}
+    for num, key in enumerate(r.keys("*")):
+        if num % 2 != 0:
+            continue
+
+        out[key] = {
+            "title": r.hget(key, "title"),
+            "note": r.hget(key, "note"),
+            "genres": r.lrange(f"{key}:genres", 0, -1),
+        }
+
+    return jsonify(out), 200
+
+
+@app.delete("/api/movies")
+def drop_movie():
+    title = str(request.args.get("t")).strip().lower()
+    removes = r.delete(title)
+    r.delete(f"{title}:genres")
+
+    return (
+        ({"message": "Movie deleted successfully!", "title": title}, 202)
+        if removes > 0
+        else ({"message": "Movie not found"}, 200)
     )

@@ -8,14 +8,3 @@ def redis_connection():
         port=RedisConfig.PORT,
         decode_responses=True,
     )
-
-
-class Movie:
-    def __init__(self):
-        pass
-
-    def toRedis(self):
-        pass
-
-    def fromRedis(self):
-        pass
