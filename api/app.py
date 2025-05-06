@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import requests
 from markupsafe import escape
+from redis.exceptions import ResponseError
 
 from api.redis_client import redis_connection
 
@@ -11,7 +12,7 @@ r = redis_connection()
 
 @app.route("/")
 def index():
-    return "hello world"
+    return "How to call this api:\nTODO: make docs"
 
 
 ## TODO: Handle duplicate post
@@ -70,18 +71,22 @@ def post_movie():
 
 @app.get("/api/movies")
 def get_movies():
-    out = {}
-    for num, key in enumerate(r.keys("*")):
-        if num % 2 != 0:
-            continue
+    try:
+        out = {}
+        for num, key in enumerate(r.keys("*")):
+            if r.type(key) != "hash":
+                continue
 
-        out[key] = {
-            "title": r.hget(key, "title"),
-            "note": r.hget(key, "note"),
-            "genres": r.lrange(f"{key}:genres", 0, -1),
-        }
+            out[key] = {
+                "title": r.hget(key, "title"),
+                "note": r.hget(key, "note"),
+                "genres": r.lrange(f"{key}:genres", 0, -1),
+            }
 
-    return jsonify(out), 200
+        return jsonify(out), 200
+    except ResponseError as e:
+        print(e)
+        return "", 500
 
 
 @app.delete("/api/movies")
@@ -95,3 +100,7 @@ def drop_movie():
         if removes > 0
         else ({"message": "Movie not found"}, 200)
     )
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0")
