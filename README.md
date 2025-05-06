@@ -5,7 +5,8 @@ This is a simple API made in Flask and *hopefully* deployed from a Docker contai
 ### Important commands
 
 Starting Flask app in debug mode for testing  
-`flask --app api/app run --debug`
+`flask --app api/app run --debug`  
+Shortcut: `make flask-debug`
 
 Running tests  
 `pytest`

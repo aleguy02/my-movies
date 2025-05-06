@@ -16,6 +16,7 @@ def index():
 
 
 ## TODO: Handle duplicate post
+## TODO: Add retries? https://docs.docker.com/compose/gettingstarted/#step-1-set-up
 @app.post("/api/movies")
 def post_movie():
     """
@@ -84,9 +85,14 @@ def get_movies():
             }
 
         return jsonify(out), 200
+    # this was for debugging Redis connection
     except ResponseError as e:
         print(e)
         return "", 500
+    # but we should probably catch other errors too
+    except Exception as e:
+        print(e)
+        return f"Unknown error: {e}", 500
 
 
 @app.delete("/api/movies")

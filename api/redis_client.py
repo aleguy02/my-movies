@@ -1,10 +1,12 @@
 import redis
-from api.config import RedisConfig
+from api.config import LocalConfig, ComposeConfig
 
 
 def redis_connection():
     return redis.Redis(
-        host=RedisConfig.HOST,
-        port=RedisConfig.PORT,
+        # host=LocalConfig.HOST,
+        # port=LocalConfig.PORT,
+        host=ComposeConfig.HOST,
+        port=ComposeConfig.PORT,
         decode_responses=True,
     )
