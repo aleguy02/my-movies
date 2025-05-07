@@ -2,11 +2,13 @@ from flask import Flask, jsonify, request
 import requests
 from markupsafe import escape
 from redis.exceptions import ResponseError
+from flask_cors import CORS
 
 from api.redis_client import redis_connection
 
 API_KEY = "3e4bbdc8"
 app = Flask(__name__)
+CORS(app, resources=r"/api/*")
 r = redis_connection()
 
 
