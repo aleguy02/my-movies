@@ -17,7 +17,6 @@ def index():
     return "How to call this api:\nTODO: make docs"
 
 
-## TODO: Handle duplicate post
 ## TODO: Add retries? https://docs.docker.com/compose/gettingstarted/#step-1-set-up
 @app.post("/api/movies")
 def post_movie():

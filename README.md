@@ -1,6 +1,6 @@
 ## Flask Docker API
 
-This is a simple API made in Flask and *hopefully* deployed from a Docker container
+This is a simple API made in Flask and _hopefully_ deployed from a Docker container
 
 ### Important commands
 
@@ -17,3 +17,8 @@ Starting redis instance for testing
 Stopping redis instance  
 `docker stop test-redis`
 
+Start service
+`docker compose up`
+
+Stop service
+`docker compose down`
