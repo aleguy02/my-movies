@@ -17,3 +17,5 @@ COPY . .
 
 # Define the command to run the application using Gunicorn
 CMD [ "gunicorn", "--bind" , "0.0.0.0:5000", "api.wsgi:app" ]
+
+EXPOSE 5000

@@ -1,147 +1,23 @@
-# Flask Docker API
+# my movies
 
-This is a simple API I made so I could keep track of movies I wanted to watch. It leverages the Open Movie Database API to get movies.
+my movies is a simple web app I made for personal use to track movies that I wanted to watch. The app uses a microservice architecture for the frontend, backend, and redis database. Read compose.yaml for more information.
 
 ## Setup
-Clone the repository into your machine. Move into the directory where you cloned it to and do the following command.  
+
+If you are curious to learn more about how the backend and frontend work, they have their own READMEs that go into more detail. Here, I'll focus on leveraging Docker Compose to get you up and running as soon as possible. So, to start the application, do:
+
 ```bash
-docker compose up
+docker compose up -d
 ```
-And that's it! The app is now running across two containers: one for the app logic and one for a Redis data store. You can leave the app running or, when you're done using it, take it down with  
+
+then go to localhost:3000 to view the app. That's it! It's super simple by design. If you want to stop the application, simply do:
+
 ```bash
 docker compose down
 ```
-Don't worry, there's a volume set up to persist data. See `compose.yaml` and `Dockerfile` for more info.
 
-## How to Use
+## Usage
 
-### `POST /api/movies`
+The main screen has two parts: a movie form and a list of movies you are currently tracking.
 
-#### Description
-
-Adds a movie to your list.
-
-#### Request
-
-* **Content-Type**: `application/x-www-form-urlencoded`
-* **Body Parameters**:
-
-  | Key   | Type   | Required | Description            |
-  | ----- | ------ | -------- | ---------------------- |
-  | title | string | ✅        | Title of the movie     |
-  | note  | string | ✅        | Personal note about it |
-
-#### Example Request
-
-```http
-POST /api/movies
-Content-Type: application/x-www-form-urlencoded
-
-title=The Matrix&note=A great sci-fi film
-```
-
-#### Example Success Response
-
-```json
-{
-  "message": "Movie added successfully!",
-  "title": "The Matrix",
-  "genres": ["action", "sci-fi"],
-  "note": "A great sci-fi film"
-}
-```
-
-#### Example Error Response
-
-```json
-{
-  "Error": "Movie not found!"
-}
-```
-
-Status Code: `404`
-
-### `GET /api/movies`
-
-#### Description
-
-Retrieves all saved movies, including title, note, and genres.
-
-#### Request
-
-```http
-GET /api/movies
-```
-
-#### Example Success Response
-
-```json
-{
-  "the matrix": {
-    "title": "The Matrix",
-    "note": "A great sci-fi film",
-    "genres": ["action", "sci-fi"]
-  },
-  "toy story": {
-    "title": "Toy Story",
-    "note": "Childhood favorite",
-    "genres": ["animation", "adventure", "comedy"]
-  }
-}
-```
-
-#### Error Responses
-
-* `500 Internal Server Error`: Redis or unknown server error.
-
-### `DELETE /api/movies`
-
-#### Description
-
-Deletes a movie entry and its genres by title.
-
-#### Request
-
-* **Query Parameters**:
-
-  | Key | Type   | Required | Description                                     |
-  | --- | ------ | -------- | ----------------------------------------------- |
-  | t   | string | ✅        | Title of the movie to delete (case-insensitive) |
-
-#### Example Request
-
-```http
-DELETE /api/movies?t=The Matrix
-```
-
-#### Example Success Response
-
-```json
-{
-  "message": "Movie deleted successfully!",
-  "title": "the matrix"
-}
-```
-
-#### If Movie Not Found
-
-```json
-{
-  "message": "Movie not found"
-}
-```
-
-## Other commands
-
-Starting Flask app in debug mode for testing  
-`flask --app api/app run --debug`  
-Shortcut: `make flask-debug`
-
-Running tests  
-`pytest`
-
-Starting redis instance for testing  
-`docker start test-redis`
-
-Stopping redis instance  
-`docker stop test-redis`
+The movie form has two inputs: the movie name and a note. The movie name must be spelled correctly and maintain the punctuation of the actual title. It is case insensitive. The note is for you, and can be anything you want.
