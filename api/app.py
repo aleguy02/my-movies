@@ -103,9 +103,8 @@ def drop_movie():
     r.delete(f"{title}:genres")
 
     return (
-        ({"message": "Movie deleted successfully!", "title": title}, 202)
-        if removes > 0
-        else ({"message": "Movie not found"}, 200)
+        jsonify({"message": "Movie deleted successfully!", "title": title}),
+        204 if removes > 0 else (jsonify({"message": "Movie not found"}), 404),
     )
 
 
